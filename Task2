@@ -1,0 +1,31 @@
+# 2) Скачать нейросеть BERT для лингвистических задач и реализовать
+# процедуру классификации текстов (без оглядки на качество классификации)
+
+from transformers import BertTokenizer, TFBertForSequenceClassification
+import tensorflow as tf
+
+
+# Загрузка модели и токенизатора
+model_name = 'bert-base-uncased'
+tokenizer = BertTokenizer.from_pretrained(model_name)
+model = TFBertForSequenceClassification.from_pretrained(model_name, num_labels=2)
+
+
+# Функция для классификации текста
+def classify_text(text):
+    # Токенизация текста
+    inputs = tokenizer(text, return_tensors="tf")
+
+    # Прогнозирование
+    outputs = model(inputs)
+    logits = outputs.logits
+    probabilities = tf.nn.softmax(logits, axis=1)
+
+    # Возвращение результата
+    return probabilities.numpy()[0]
+
+
+# Пример использования
+text = "This is a great movie!"
+probabilities = classify_text(text)
+print(f"Positive: {probabilities[1]:.4f}, Negative: {probabilities[0]:.4f}")
